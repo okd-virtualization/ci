@@ -19,8 +19,6 @@ trap "cleanup" INT TERM EXIT
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-echo "OCP_VERSION: $OCP_VERSION"
-
 echo "creating catalogsource"
 cat <<EOF | oc apply -f -
 apiVersion: operators.coreos.com/v1alpha1
