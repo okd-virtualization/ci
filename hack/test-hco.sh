@@ -2,21 +2,8 @@
 
 set -euxo pipefail
 
-echo "get matching kubevirt release from the build"
-VIRT_OPERATOR_IMAGE=$(oc get deployment virt-operator -n ${TARGET_NAMESPACE} -o jsonpath='{.spec.template.spec.containers[0].image}' |
-  sed 's|registry.redhat.io/container-native-virtualization/|brew.registry.redhat.io/rh-osbs/container-native-virtualization-|')
-KUBEVIRT_TAG=$(oc image info -a /tmp/authfile.new ${VIRT_OPERATOR_IMAGE} -o json | jq '.config.config.Labels["upstream-version"]')
-KUBEVIRT_RELEASE=v$(echo ${KUBEVIRT_TAG} | awk -F '-' '{print $1}' | tr -d '"')
-if [[ ${KUBEVIRT_TAG} == *"rc"* ]]; then
-  KUBEVIRT_TESTS_URL=https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_RELEASE}/tests.test
-  if ! curl --output /dev/null --silent --head --fail "${KUBEVIRT_TESTS_URL}"; then
-    # First checking if the official release exists (without "rc"). If not - use the release candidate version.
-    KUBEVIRT_RELEASE=v$(echo ${KUBEVIRT_TAG} | awk -F '-' '{print $1"-"$2}' | tr -d '"')
-  fi
-fi
-
-trap 'rm -rf /tmp/authfile*' EXIT SIGINT SIGTERM
-
+echo "get matching kubevirt release"
+KUBEVIRT_RELEASE=$(oc get kubevirt.kubevirt.io/kubevirt-kubevirt-hyperconverged -n ${TARGET_NAMESPACE} -o=jsonpath="{.status.observedKubeVirtVersion}")
 echo "Kubevirt release in use is: ${KUBEVIRT_RELEASE}"
 
 echo "downloading the test binary"
