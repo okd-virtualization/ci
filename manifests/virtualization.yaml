@@ -1,0 +1,28 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: hco-unstable-catalog-source
+  namespace: openshift-marketplace
+spec:
+  sourceType: grpc
+  image: quay.io/kubevirt/hyperconverged-cluster-index:1.6.0-unstable
+  displayName: Kubevirt Hyperconverged Cluster Operator
+  publisher: Kubevirt Project
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+    name: kubevirt-hyperconverged-group
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: kubevirt-hyperconverged
+  labels:
+    operators.coreos.com/kubevirt-hyperconverged.kubevirt-hyperconverged: ''
+spec:
+  channel: 1.6.0
+  installPlanApproval: Automatic
+  name: community-kubevirt-hyperconverged
+  source: hco-unstable-catalog-source
+  sourceNamespace: openshift-marketplace
