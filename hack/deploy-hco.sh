@@ -21,6 +21,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 echo "creating catalogsource, operator group, and subscription"
 oc create namespace ${TARGET_NAMESPACE}
+oc apply -f ${SCRIPT_DIR}/../manifests/catalog-unstable.yaml
 oc apply -n ${TARGET_NAMESPACE} -f ${SCRIPT_DIR}/../manifests/virtualization.yaml
 
 echo "waiting for HyperConverged operator to become ready"
