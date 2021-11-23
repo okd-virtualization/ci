@@ -1,0 +1,21 @@
+apiVersion: machineconfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  generation: 1
+  labels:
+    machineconfiguration.openshift.io/role: worker
+    machine.openshift.io/zone: us-central1-f
+  name: 99-worker-format-sdb
+spec:
+  config:
+    ignition:
+      version: 3.2.0
+    storage:
+      disks:
+      - device: "/dev/sdb"
+        wipeTable: true
+        partitions:
+        - label: cephstorage
+          number: 1
+          sizeMiB: 128000
+          startMiB: 0
