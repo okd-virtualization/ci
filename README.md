@@ -1,6 +1,6 @@
 # OKD Virtualization
 
-[![Build Status](https://prow.ci.openshift.org/badge.svg?jobs=periodic-ci-okd-virtualization-ci-master-okd-e2e-deploy)](https://prow.ci.openshift.org/job-history/gs/origin-ci-test/logs/periodic-ci-okd-virtualization-ci-master-okd-e2e-deploy)
+[![Build Status](https://prow.ci.openshift.org/badge.svg?jobs=periodic-ci-okd-virtualization-release-master-okd-e2e-deploy)](https://prow.ci.openshift.org/job-history/gs/origin-ci-test/logs/periodic-ci-okd-virtualization-release-master-okd-e2e-deploy)
 
 # Testing the integration between
 
