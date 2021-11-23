@@ -1,5 +1,5 @@
 #
-# Manifest to subscribe to the HCO operator (stable release)
+# Manifest to subscribe to the HCO operator (unstable)
 #
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
@@ -13,8 +13,8 @@ metadata:
   labels:
     operators.coreos.com/kubevirt-hyperconverged.kubevirt-hyperconverged: ''
 spec:
-  channel: stable
+  channel: 1.6.0
   installPlanApproval: Automatic
   name: community-kubevirt-hyperconverged
-  source: community-operators
+  source: hco-unstable-catalog-source
   sourceNamespace: openshift-marketplace
