@@ -1,0 +1,82 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: fedora-35-test
+  namespace: default
+spec:
+  dataVolumeTemplates:
+    - apiVersion: cdi.kubevirt.io/v1beta1
+      kind: DataVolume
+      metadata:
+        creationTimestamp: null
+        name: fedora-35-test
+      spec:
+        pvc:
+          accessModes:
+            - ReadWriteMany
+          resources:
+            requests:
+              storage: 30Gi
+          storageClassName: rook-ceph-block
+          volumeMode: Block
+        source:
+          http:
+            url: >-
+              https://download.fedoraproject.org/pub/fedora/linux/releases/35/Cloud/x86_64/images/Fedora-Cloud-Base-35-1.2.x86_64.raw.xz
+  running: false
+  template:
+    metadata:
+      annotations:
+        vm.kubevirt.io/flavor: small
+        vm.kubevirt.io/os: fedora
+        vm.kubevirt.io/workload: server
+      creationTimestamp: null
+      labels:
+        flavor.template.kubevirt.io/small: 'true'
+        kubevirt.io/domain: fedora-35-test
+        kubevirt.io/size: small
+        os.template.kubevirt.io/fedora34: 'true'
+        vm.kubevirt.io/name: fedora-35-test
+        workload.template.kubevirt.io/server: 'true'
+    spec:
+      domain:
+        cpu:
+          cores: 1
+          sockets: 1
+          threads: 1
+        devices:
+          disks:
+            - bootOrder: 1
+              disk:
+                bus: virtio
+              name: fedora-35-test
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+          interfaces:
+            - macAddress: '02:a3:1f:00:00:00'
+              masquerade: {}
+              name: default
+          networkInterfaceMultiqueue: true
+          rng: {}
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 2Gi
+      hostname: fedora-35-test
+      networks:
+        - name: default
+          pod: {}
+      terminationGracePeriodSeconds: 180
+      volumes:
+        - dataVolume:
+            name: fedora-35-test
+          name: fedora-35-test
+        - cloudInitNoCloud:
+            userData: |-
+              #cloud-config
+              user: fedora
+              password: j0h2-8i82-gt1u
+              chpasswd: { expire: False }
+          name: cloudinitdisk

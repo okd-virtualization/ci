@@ -35,14 +35,33 @@ cat <<EOF
 =================================
      Start of HCO state dump         
 =================================
+EOF
 
+if [ -n "${ARTIFACT_DIR}" ]; then
+    cat <<EOF
+==============================
+executing kubevirt-must-gather
+==============================
+
+EOF
+    mkdir -p ${ARTIFACT_DIR}/kubevirt-must-gather
+    RunCmd "${CMD} adm must-gather --image=quay.io/kubevirt/must-gather:latest --dest-dir=${ARTIFACT_DIR}/kubevirt-must-gather"
+    mkdir -p ${ARTIFACT_DIR}/origin-must-gather
+    RunCmd "${CMD} adm must-gather --image=quay.io/openshift/origin-must-gather:latest --dest-dir=${ARTIFACT_DIR}/origin-must-gather"
+    mkdir -p ${ARTIFACT_DIR}/rook-must-gather
+    RunCmd "${CMD} adm must-gather --image=quay.io/ocs-dev/ocs-must-gather:latest --dest-dir=${ARTIFACT_DIR}/rook-must-gather"
+fi
+
+cat <<EOF
 ==========================
 summary of operator status
 ==========================
 
 EOF
 NAMESPACE_ARG=$1
+ROOK_NAMESPACE_ARG=$2
 HCO_NAMESPACE=${NAMESPACE_ARG:-"kubevirt-hyperconverged"}
+ROOK_NAMESPACE=${ROOK_NAMESPACE_ARG:-"rook-ceph"}
 echo $1
 
 RunCmd "${CMD} get pods -n ${HCO_NAMESPACE}"
@@ -165,6 +184,64 @@ HCO Deployments
 EOF
 
 RunCmd "$CMD get deployments -n ${HCO_NAMESPACE} -o json"
+
+cat <<EOF
+
+=================
+Rook Ceph Cluster
+=================
+
+EOF
+
+RunCmd "$CMD get CephCluster -n ${ROOK_NAMESPACE} rook-ceph -o yaml"
+
+cat <<EOF
+
+====================
+Rook Ceph Block Pool
+====================
+
+EOF
+
+RunCmd "$CMD get CephBlockPool -n ${ROOK_NAMESPACE} replicapool -o yaml"
+
+cat <<EOF
+
+======================
+Rook Ceph StorageClass
+======================
+
+EOF
+
+RunCmd "$CMD get storageclass rook-ceph-block -o yaml"
+
+cat <<EOF
+
+==============
+Rook Ceph Pods
+==============
+
+EOF
+
+RunCmd "$CMD get pods -n ${ROOK_NAMESPACE}"
+
+cat <<EOF
+
+==============
+Rook Pods Logs
+==============
+
+EOF
+
+for p in $($CMD -n ${ROOK_NAMESPACE} get pods -o jsonpath='{.items[*].metadata.name}')
+do
+    for c in $($CMD -n ${ROOK_NAMESPACE} get pod ${p} -o jsonpath='{.spec.containers[*].name}')
+    do
+        echo "====== BEGIN logs from pod: ${p} ${c} ======"
+	$CMD logs -n ${ROOK_NAMESPACE} -c ${c} ${p} || true
+        echo "====== END logs from pod: ${p} ${c} ======"
+    done
+done
 
 cat <<EOF
 ===============================
