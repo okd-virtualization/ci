@@ -1,7 +1,7 @@
 {
   "storageClassLocal": "hostpath-provisioner",
   "storageClassHostPath": "hostpath-provisioner",
-  "storageClassRhel": "hostpath-provisioner",
-  "storageClassWindows": "hostpath-provisioner",
+  "storageClassRhel": "rook-ceph-block",
+  "storageClassWindows": "rook-ceph-block",
   "manageStorageClasses": false
 }
